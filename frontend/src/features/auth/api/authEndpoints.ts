@@ -1,8 +1,17 @@
-const authBaseUrl = 'http://localhost:5287/api/auth'
+const authBaseUrl = 'http://localhost:5287/api'
 
 export const authEndpoints = {
-  login: `${authBaseUrl}/login`,
-  register: `${authBaseUrl}/register`,
-    me: `${authBaseUrl}/me`,
-  logout: `${authBaseUrl}/logout`
+  login: `${authBaseUrl}/auth/login`,
+  register: `${authBaseUrl}/auth/register`,
+    me: `${authBaseUrl}/auth/me`,
+  logout: `${authBaseUrl}/auth/logout`
+} as const
+
+export const technologiesEndpoints = {
+    getTechnologies: `${authBaseUrl}/topics/technologies`,
+    getTopics: `${authBaseUrl}/topics/sub`
+} as const
+
+export const quizEndpoints = {
+    generateQuiz: `${authBaseUrl}/quiz/generate`
 } as const

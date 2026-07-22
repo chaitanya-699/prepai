@@ -14,8 +14,11 @@ builder.Services.AddDbContext<backend.Data.PrepAiDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<backend.service.AuthService>();
 builder.Services.AddScoped<backend.repository.UserRepo>();
+builder.Services.AddScoped<backend.repository.TechnologyRepo>();
+
 builder.Services.AddSingleton<backend.service.PasswordService>();
 builder.Services.AddSingleton<backend.service.JwtService>();
+
 
 // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //     .AddJwtBearer(options =>

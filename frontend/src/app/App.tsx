@@ -1,8 +1,13 @@
-import { AuthProvider } from '../features/auth/context/AuthProvider'
-import { AppRouter } from './router/AppRouter'
+import { AuthProvider } from "../features/auth/context/AuthProvider";
+import { NotificationProvider } from "../features/notifications/NotificationProvider";
+import { AppRouter } from "./router/AppRouter";
 
 export default function App() {
-    return <AuthProvider>
-                <AppRouter />
-            </AuthProvider>
+  return (
+    <AuthProvider>
+      <NotificationProvider>
+        <AppRouter />
+      </NotificationProvider>
+    </AuthProvider>
+  );
 }

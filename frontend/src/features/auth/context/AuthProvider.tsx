@@ -14,28 +14,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadUser = async () => {
-      setUser({
-        id: 1,
-        email: "test@example.com",
-        name: "Test User",
-      });
+      try {
+        const response = await fetch(authEndpoints.me, {
+          credentials: "include",
+        });
 
-    //   try {
-    //     const response = await fetch(authEndpoints.me, {
-    //       credentials: "include",
-    //     });
-
-    //     if (!response.ok) {
-    //       setUser(null);
-    //     } else {
-    //       const user = await response.json();
-    //       setUser(user);
-    //     }
-    //   } catch {
-    //     setUser(null);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
+        if (!response.ok) {
+          setUser(null);
+        } else {
+          const user = await response.json();
+          setUser(user);
+        }
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadUser();

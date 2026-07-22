@@ -5,5 +5,7 @@ namespace backend.Data
     public class PrepAiDbContext(DbContextOptions<PrepAiDbContext> options) : DbContext(options)
     {
         public DbSet<backend.model.User> Users { get; set; }
+        public DbSet<backend.model.Technology> Technologies { get; set; }
+        public DbSet<backend.model.Topic> Topics { get; set; }
     }
 }

@@ -1,38 +1,18 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
   type ChangeEvent,
   type DragEvent,
 } from "react";
-
-const subjectTopics = {
-  ".NET": [
-    "EF Core",
-    "ASP.NET MVC",
-    "JWT Authentication",
-    "JSON & APIs",
-    "LINQ",
-    "C# Fundamentals",
-  ],
-  React: [
-    "Hooks",
-    "State Management",
-    "Component Lifecycle",
-    "React Router",
-    "Performance",
-  ],
-  SQL: [
-    "Joins",
-    "Query Optimisation",
-    "Stored Procedures",
-    "Indexes",
-    "Normalization",
-  ],
-  Python: ["Functions", "OOP", "Django", "Asyncio", "Data Structures"],
-  Java: ["Collections", "Spring Boot", "JVM", "Multithreading", "Streams"],
-  Cloud: ["Docker", "Kubernetes", "AWS Core", "CI/CD", "Microservices"],
-} as const;
+import {
+  generateQuiz,
+  getTechnologies,
+  getTopicsByTechnology,
+  type Topics,
+} from "../features/auth/types";
+import { useNotifications } from "../features/notifications/NotificationProvider";
 
 const difficulties = [
   { name: "Foundation", detail: "Core concepts & recall", tone: "lime" },
@@ -57,16 +37,25 @@ const wizardSteps = [
   { id: 6, label: "REVIEW" },
 ];
 
-type Subject = keyof typeof subjectTopics;
+type Subject = string;
 type Difficulty = (typeof difficulties)[number]["name"];
 type SelectedTopic = { subject: Subject; topic: string };
+
+const TECHNOLOGY_STORAGE_KEY = "prepai-technologies";
+const TOPICS_STORAGE_KEY = "prepai-topics";
 
 function BuildQuizPage() {
   const [activeStep, setActiveStep] = useState(1);
   const [activeSubject, setActiveSubject] = useState<Subject>(".NET");
+  const [subjectTopics, setSubjectTopics] = useState<Topics>({});
+  const [technologies, setTechnologies] = useState<string[]>([]);
+  const [techCounts, setTechCounts] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingTopics, setIsLoadingTopics] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<SelectedTopic[]>([
-    { subject: ".NET", topic: "EF Core" },
-    { subject: ".NET", topic: "JWT Authentication" },
+    { subject: ".NET", topic: "Entity Framework Core" },
+    { subject: ".NET", topic: "JWT" },
   ]);
   const [difficulty, setDifficulty] = useState<Difficulty>("Confident");
   const [questionCount, setQuestionCount] = useState(15);
@@ -74,7 +63,141 @@ function BuildQuizPage() {
   const [notesFile, setNotesFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addNotification } = useNotifications();
+
+  useEffect(() => {
+    const loadQuizData = async () => {
+      try {
+        const storedTechnologies = window.localStorage.getItem(
+          TECHNOLOGY_STORAGE_KEY,
+        );
+        const storedTopics = window.localStorage.getItem(TOPICS_STORAGE_KEY);
+
+        if (storedTechnologies) {
+          try {
+            const parsedTechnologies = JSON.parse(
+              storedTechnologies,
+            ) as string[];
+            if (
+              Array.isArray(parsedTechnologies) &&
+              parsedTechnologies.length
+            ) {
+              setTechnologies(parsedTechnologies);
+              setActiveSubject((current) =>
+                parsedTechnologies.includes(current)
+                  ? current
+                  : parsedTechnologies[0],
+              );
+            }
+          } catch {
+            window.localStorage.removeItem(TECHNOLOGY_STORAGE_KEY);
+          }
+        }
+
+        if (storedTopics) {
+          try {
+            const parsedTopics = JSON.parse(storedTopics) as Topics;
+            if (parsedTopics && typeof parsedTopics === "object") {
+              setSubjectTopics(parsedTopics);
+            }
+          } catch {
+            window.localStorage.removeItem(TOPICS_STORAGE_KEY);
+          }
+        }
+
+        const fetchedTechnologies = await getTechnologies();
+
+        // The backend now returns a mapping { technology: count }.
+        // Accept either an array (legacy) or an object and normalize to keys.
+        if (fetchedTechnologies && typeof fetchedTechnologies === "object") {
+          if (Array.isArray(fetchedTechnologies)) {
+            setTechnologies(fetchedTechnologies);
+            window.localStorage.setItem(
+              TECHNOLOGY_STORAGE_KEY,
+              JSON.stringify(fetchedTechnologies),
+            );
+            setActiveSubject((current) =>
+              fetchedTechnologies.includes(current)
+                ? current
+                : fetchedTechnologies[0],
+            );
+          } else {
+            const keys = Object.keys(
+              fetchedTechnologies as Record<string, number>,
+            );
+            setTechnologies(keys);
+            setTechCounts(fetchedTechnologies as Record<string, number>);
+            window.localStorage.setItem(
+              TECHNOLOGY_STORAGE_KEY,
+              JSON.stringify(keys),
+            );
+            setActiveSubject((current) =>
+              keys.includes(current) ? current : keys[0],
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load quiz data", error);
+        setLoadError(
+          "Unable to load technologies right now. Showing saved data if available.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadQuizData();
+  }, []);
+
+  const loadTopicsForSubject = async (subject: Subject) => {
+    setActiveSubject(subject);
+    setLoadError(null);
+
+    const cachedTopics = subjectTopics[subject];
+    if (Array.isArray(cachedTopics) && cachedTopics.length > 0) {
+      return;
+    }
+
+    const storedTopics = window.localStorage.getItem(TOPICS_STORAGE_KEY);
+    if (storedTopics) {
+      try {
+        const parsedTopics = JSON.parse(storedTopics) as Topics;
+        const cachedFromStorage = parsedTopics[subject];
+        if (Array.isArray(cachedFromStorage) && cachedFromStorage.length > 0) {
+          setSubjectTopics((current) => ({
+            ...current,
+            [subject]: cachedFromStorage,
+          }));
+          return;
+        }
+      } catch {
+        window.localStorage.removeItem(TOPICS_STORAGE_KEY);
+      }
+    }
+
+    setIsLoadingTopics(true);
+
+    try {
+      const topics = await getTopicsByTechnology(subject);
+      const normalizedTopics = Array.isArray(topics) ? topics : [];
+
+      setSubjectTopics((current) => {
+        const nextTopics = { ...current, [subject]: normalizedTopics };
+        window.localStorage.setItem(
+          TOPICS_STORAGE_KEY,
+          JSON.stringify(nextTopics),
+        );
+        return nextTopics;
+      });
+    } catch (error) {
+      console.error("Failed to load topics", error);
+      setLoadError(`Unable to load topics for ${subject}.`);
+    } finally {
+      setIsLoadingTopics(false);
+    }
+  };
 
   const selectedSubjectCount = useMemo(
     () => new Set(selectedTopics.map(({ subject }) => subject)).size,
@@ -95,6 +218,10 @@ function BuildQuizPage() {
     }
     return "No notes added yet";
   }, [notesFile, notesText]);
+
+  const availableSubjects =
+    technologies.length > 0 ? technologies : Object.keys(subjectTopics);
+  const activeTopics = subjectTopics[activeSubject] ?? [];
 
   const hasTopic = (topic: string) =>
     selectedTopics.some(
@@ -129,6 +256,11 @@ function BuildQuizPage() {
     if (file) {
       setNotesFile(file);
       setIsGenerated(false);
+      addNotification({
+        title: "Notes uploaded",
+        message: `${file.name} is ready to guide your quiz.`,
+        tone: "success",
+      });
     }
   };
 
@@ -137,15 +269,73 @@ function BuildQuizPage() {
   const continueLabel = activeStep === 6 ? "Generate quiz" : "Continue";
   const backLabel = activeStep === 1 ? "Back" : "Go back";
 
-  const goNext = () => {
+  const goNext = async () => {
     setIsGenerated(false);
 
     if (activeStep < 6) {
       setActiveStep((value) => value + 1);
+      if (activeStep === 5) {
+        addNotification({
+          title: "Quiz setup almost ready",
+          message:
+            "Review your selections and generate when you are happy with the plan.",
+          tone: "info",
+        });
+      }
       return;
     }
 
-    setIsGenerated(true);
+    if (isGenerating) {
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const topicsForActiveSubject = selectedTopics
+        .filter((item) => item.subject === activeSubject)
+        .map((item) => item.topic);
+
+      const payload = {
+        technology: activeSubject,
+        topics:
+          topicsForActiveSubject.length > 0
+            ? topicsForActiveSubject
+            : selectedTopics.map((item) => item.topic),
+        difficulty,
+        questionCount,
+        notes: notesFile ?? (notesText.trim() ? notesText.trim() : undefined),
+        notesFileName: notesFile?.name,
+      };
+
+      const result = await generateQuiz(payload);
+
+      if (result.success) {
+        setIsGenerated(true);
+        addNotification({
+          title: "Quiz generated",
+          message:
+            result.message ??
+            `Your ${questionCount}-question quiz is ready to review.`,
+          tone: "success",
+        });
+      } else {
+        addNotification({
+          title: "Quiz generation failed",
+          message: result.message ?? "Unable to generate your quiz right now.",
+          tone: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to generate quiz", error);
+      addNotification({
+        title: "Quiz generation failed",
+        message: "Unable to generate your quiz right now.",
+        tone: "error",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const goBack = () => {
@@ -202,7 +392,9 @@ function BuildQuizPage() {
             aria-valuemax={wizardSteps.length}
             aria-label={`Step ${activeStep} of ${wizardSteps.length}`}
           >
-            <span style={{ width: `${(activeStep / wizardSteps.length) * 100}%` }} />
+            <span
+              style={{ width: `${(activeStep / wizardSteps.length) * 100}%` }}
+            />
           </div>
         </div>
 
@@ -221,8 +413,10 @@ function BuildQuizPage() {
             <div className="build-board__panel-body">
               {activeStep === 1 && (
                 <div className="build-stack-grid" aria-label="Select a subject">
-                  {(Object.keys(subjectTopics) as Subject[]).map(
-                    (subject, index) => {
+                  {isLoading ? (
+                    <p>Loading technologies…</p>
+                  ) : availableSubjects.length > 0 ? (
+                    availableSubjects.map((subject, index) => {
                       const topicCount = selectedTopics.filter(
                         (item) => item.subject === subject,
                       ).length;
@@ -236,7 +430,9 @@ function BuildQuizPage() {
                           }
                           key={subject}
                           type="button"
-                          onClick={() => setActiveSubject(subject)}
+                          onClick={() => {
+                            void loadTopicsForSubject(subject);
+                          }}
                         >
                           <span className="build-stack-card__mark">
                             {subject === ".NET"
@@ -246,13 +442,20 @@ function BuildQuizPage() {
                           <div>
                             <strong>{subject}</strong>
                             <small>
-                              {subjectTopics[subject].length} topic areas
+                              {techCounts[subject] ??
+                                (subjectTopics[subject] ?? []).length}{" "}
+                              topic areas
                             </small>
                           </div>
                           {topicCount > 0 && <b>{topicCount}</b>}
                         </button>
                       );
-                    },
+                    })
+                  ) : (
+                    <p>No technologies available yet.</p>
+                  )}
+                  {loadError && (
+                    <p className="build-board__eyebrow">{loadError}</p>
                   )}
                 </div>
               )}
@@ -264,22 +467,28 @@ function BuildQuizPage() {
                     <span>Pick as many as you need</span>
                   </div>
                   <div className="build-topic-row">
-                    {subjectTopics[activeSubject].map((topic) => (
-                      <button
-                        className={
-                          hasTopic(topic)
-                            ? "build-topic-chip is-selected"
-                            : "build-topic-chip"
-                        }
-                        key={topic}
-                        type="button"
-                        onClick={() => toggleTopic(topic)}
-                        aria-pressed={hasTopic(topic)}
-                      >
-                        <span>{hasTopic(topic) ? "✓" : "+"}</span>
-                        {topic}
-                      </button>
-                    ))}
+                    {isLoadingTopics ? (
+                      <p>Loading topics for {activeSubject}…</p>
+                    ) : activeTopics.length > 0 ? (
+                      activeTopics.map((topic) => (
+                        <button
+                          className={
+                            hasTopic(topic)
+                              ? "build-topic-chip is-selected"
+                              : "build-topic-chip"
+                          }
+                          key={topic}
+                          type="button"
+                          onClick={() => toggleTopic(topic)}
+                          aria-pressed={hasTopic(topic)}
+                        >
+                          <span>{hasTopic(topic) ? "✓" : "+"}</span>
+                          {topic}
+                        </button>
+                      ))
+                    ) : (
+                      <p>No topics available for {activeSubject} yet.</p>
+                    )}
                   </div>
 
                   {selectedTopics.length > 0 && (
@@ -324,7 +533,10 @@ function BuildQuizPage() {
                         }}
                         aria-pressed={difficulty === level.name}
                       >
-                        <span className="build-choice-card__icon" aria-hidden="true">
+                        <span
+                          className="build-choice-card__icon"
+                          aria-hidden="true"
+                        >
                           {level.name === "Foundation"
                             ? "○"
                             : level.name === "Confident"
@@ -522,16 +734,28 @@ function BuildQuizPage() {
               className="build-board__back"
               type="button"
               onClick={goBack}
-              disabled={activeStep === 1}
+              disabled={activeStep === 1 || isGenerating}
             >
               <span aria-hidden="true">←</span> {backLabel}
             </button>
             <button
               className="build-board__continue"
               type="button"
-              onClick={goNext}
+              onClick={() => {
+                void goNext();
+              }}
+              disabled={isGenerating}
             >
-              {continueLabel} <span aria-hidden="true">→</span>
+              {isGenerating ? (
+                <>
+                  <span className="build-board__spinner" aria-hidden="true" />
+                  {continueLabel}
+                </>
+              ) : (
+                <>
+                  {continueLabel} <span aria-hidden="true">→</span>
+                </>
+              )}
             </button>
           </div>
         </section>
