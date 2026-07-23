@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 import { authEndpoints } from "../../features/auth/api/authEndpoints";
 import { useNotifications } from "../../features/notifications/NotificationProvider";
+import "../../styles/shared/brand.css";
+import "../../styles/layout/site-header.css";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);

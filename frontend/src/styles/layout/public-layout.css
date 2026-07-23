@@ -1,0 +1,46 @@
+.page-noise {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0.055;
+	z-index: 9;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+}
+
+.announcement {
+	min-height: 38px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 8px 20px;
+	color: #101123;
+	background: var(--lime);
+	font-size: 12px;
+	font-weight: 800;
+	letter-spacing: 0.02em;
+}
+
+.announcement a {
+	border-bottom: 1px solid currentColor;
+}
+
+.spark {
+	font-size: 15px;
+	line-height: 0;
+}
+
+@media (max-width: 500px) {
+.announcement {
+		font-size: 10px;
+	}
+
+.announcement span:not(.spark) {
+		display: none;
+	}
+
+.announcement {
+		padding-inline: 14px;
+		text-align: center;
+	}
+}

@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { SiteFooter } from './SiteFooter'
 import { SiteHeader } from './SiteHeader'
+import '../../styles/layout/public-layout.css'
 
 export function PublicLayout() {
   return (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/hooks/useAuth";
+import "../styles/pages/home-page.css";
 
 const tickerSubjects = [
   ".NET",

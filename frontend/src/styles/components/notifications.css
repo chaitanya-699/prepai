@@ -1,0 +1,81 @@
+.app-notification-stack {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	z-index: 1200;
+	max-width: min(360px, calc(100vw - 32px));
+}
+
+.app-notification {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 14px 14px 14px 12px;
+	border: 1px solid var(--border);
+	background: linear-gradient(180deg, var(--surface-card), var(--surface-deep));
+	box-shadow: 7px 7px 0 var(--shadow-hard);
+	color: var(--text);
+}
+
+.app-notification__marker {
+	width: 4px;
+	flex: 0 0 auto;
+	align-self: stretch;
+	border-radius: 999px;
+}
+
+.app-notification--success {
+	border-color: rgba(198, 232, 117, 0.35);
+}
+
+.app-notification--success .app-notification__marker {
+	background: var(--lime);
+}
+
+.app-notification--error {
+	border-color: rgba(255, 180, 140, 0.35);
+}
+
+.app-notification--error .app-notification__marker {
+	background: var(--peach);
+}
+
+.app-notification--info {
+	border-color: rgba(142, 184, 255, 0.32);
+}
+
+.app-notification--info .app-notification__marker {
+	background: var(--blue);
+}
+
+.app-notification__content {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.app-notification__content strong {
+	font-size: 0.95rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+}
+
+.app-notification__content p {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.45;
+	color: var(--text-muted);
+}
+
+.app-notification__close {
+	margin-left: auto;
+	border: 0;
+	background: transparent;
+	color: var(--text-soft-white);
+	font-size: 1.15rem;
+	line-height: 1;
+}

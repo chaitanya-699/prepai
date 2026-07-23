@@ -3,6 +3,7 @@ import { authEndpoints } from "../api/authEndpoints";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../../notifications/NotificationProvider";
+import "../../../styles/components/auth-forms.css";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");

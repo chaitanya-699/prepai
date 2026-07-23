@@ -13,5 +13,6 @@ export const technologiesEndpoints = {
 } as const
 
 export const quizEndpoints = {
-    generateQuiz: `${authBaseUrl}/quiz/generate`
+    generateQuiz: `${authBaseUrl}/quiz/generate`,
+    generateQuizWithFile: `${authBaseUrl}/quiz/generate-with-file`
 } as const

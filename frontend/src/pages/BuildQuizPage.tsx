@@ -13,6 +13,7 @@ import {
   type Topics,
 } from "../features/auth/types";
 import { useNotifications } from "../features/notifications/NotificationProvider";
+import "../styles/pages/build-quiz-page.css";
 
 const difficulties = [
   { name: "Foundation", detail: "Core concepts & recall", tone: "lime" },

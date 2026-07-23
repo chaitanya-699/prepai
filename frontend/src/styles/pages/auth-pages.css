@@ -1,0 +1,126 @@
+.auth-back-button:focus-visible {
+	outlinE: 2px solid var(--lime);
+	outline-offset: 2px;
+}
+
+.auth-screen {
+	padding-top: 90px;
+	padding-bottom: 110px;
+}
+
+.auth-screen__inner {
+	display: grid;
+	grid-template-columns: 0.9fr 1.1fr;
+	gap: 28px;
+	align-items: start;
+}
+
+.auth-screen__intro {
+	display: grid;
+	gap: 16px;
+	align-content: start;
+	padding: 30px;
+	border: 1px solid var(--border);
+	background: rgba(22, 23, 42, 0.72);
+	box-shadow: 7px 7px 0 var(--shadow-hard);
+}
+
+.auth-screen__intro h2 {
+	margin: 0;
+	font-size: clamp(2.2rem, 4vw, 4rem);
+	line-height: 0.95;
+	letter-spacing: -0.07em;
+	text-transform: uppercase;
+}
+
+.auth-screen__intro p {
+	margin: 0;
+	color: var(--text-muted);
+	line-height: 1.6;
+}
+
+.auth-back-button {
+	justify-self: start;
+	padding: 12px 16px;
+	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.02);
+	color: var(--text);
+	font-weight: 850;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	box-shadow: 4px 4px 0 var(--shadow-hard);
+	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.auth-back-button:hover {
+	transform: translate(-2px, -2px);
+	border-color: var(--violet);
+	box-shadow: 6px 6px 0 var(--violet);
+}
+
+.auth-screen__form {
+	display: flex;
+	justify-content: center;
+}
+
+.auth-screen__form .auth-card {
+	width: min(100%, 560px);
+}
+
+.auth-section {
+	padding-top: 84px;
+	padding-bottom: 100px;
+}
+
+.auth-section__intro {
+	margin-bottom: 28px;
+}
+
+.auth-section__grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 24px;
+}
+
+.auth-section__grid > div {
+	scroll-margin-top: 112px;
+}
+
+@media (max-width: 820px) {
+.auth-screen {
+		padding-top: 64px;
+		padding-bottom: 84px;
+	}
+
+.auth-screen__inner {
+		grid-template-columns: 1fr;
+		gap: 18px;
+	}
+
+.auth-screen__intro {
+		display: none;
+	}
+
+.auth-screen__intro {
+		padding: 22px;
+	}
+
+.auth-screen__form .auth-card {
+		width: 100%;
+	}
+}
+
+@media (max-width: 500px) {
+.auth-screen {
+		padding-top: 52px;
+		padding-bottom: 64px;
+	}
+
+.auth-screen__intro {
+		padding: 18px;
+	}
+
+.auth-screen__intro h2 {
+		font-size: 2rem;
+	}
+}

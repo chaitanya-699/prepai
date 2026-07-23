@@ -3,6 +3,7 @@ import { authEndpoints } from "../api/authEndpoints";
 import { useAuth } from "../hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useNotifications } from "../../notifications/NotificationProvider";
+import "../../../styles/components/auth-forms.css";
 export default function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();

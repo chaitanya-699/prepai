@@ -1,0 +1,38 @@
+.brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	text-decoration: none;
+	color: var(--text-soft-white);
+	font-size: 18px;
+	font-weight: 900;
+	letter-spacing: -0.055em;
+}
+
+.brand-mark {
+	width: 28px;
+	height: 28px;
+	display: grid;
+	place-items: center;
+	color: var(--ink);
+	background: var(--lime);
+	border: 1px solid #e8ffac;
+	transform: rotate(-10deg);
+	box-shadow: 4px 4px 0 var(--violet);
+}
+
+.brand-mark svg {
+	width: 18px;
+	transform: rotate(9deg);
+}
+
+@media (max-width: 500px) {
+.brand {
+		font-size: 16px;
+	}
+
+.brand-mark {
+		width: 24px;
+		height: 24px;
+	}
+}

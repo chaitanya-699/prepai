@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import '../../styles/shared/brand.css'
+import '../../styles/layout/site-footer.css'
 
 export function SiteFooter() {
   return (

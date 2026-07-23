@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+	--ink: #0e0f1b;
+	--shadow: #0a0b13;
+	--surface-deep: #111222;
+	--surface-card: #16172a;
+	--surface-raised: #1c1d34;
+	--surface-hover: #20213a;
+	--border: #383a5f;
+	--border-subtle: #303252;
+	--border-strong: #565a87;
+	--text: #f5f4ff;
+	--text-soft-white: #f2f3ff;
+	--text-muted: #aeb4ee;
+	--text-subtle: #969bc9;
+	--lime: #c6e875;
+	--lime-light: #dff99e;
+	--violet: #a992ff;
+	--violet-pale: #cfc4ff;
+	--blue: #8eb8ff;
+	--peach: #ffb48c;
+	--on-lime: #111224;
+	--on-peach: #221a1f;
+	--shadow-hard: #0a0b13;
+	--header-bg: rgba(14, 15, 27, 0.87);
+	--header-border: rgba(174, 180, 238, 0.18);
+	--grid-ring-1: rgba(85, 88, 131, 0.16);
+	--grid-ring-2: rgba(85, 88, 131, 0.08);
+	--lime-decoration: rgba(198, 232, 117, 0.3);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: 'Inter', sans-serif;
+	scroll-behavior: smooth;
+	background:
+		radial-gradient(circle at top left, rgba(169, 146, 255, 0.12), transparent 28%),
+		radial-gradient(circle at top right, rgba(142, 184, 255, 0.09), transparent 24%),
+		linear-gradient(180deg, #111222 0%, #0e0f1b 50%, #0c0d16 100%);
+	color: var(--text);
+}
+
+button,
+input,
+select {
+	font: inherit;
+}
+
+button {
+	cursor: pointer;
+}

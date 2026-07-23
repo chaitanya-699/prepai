@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import "../../styles/components/notifications.css";
 
 export type NotificationTone = "success" | "error" | "info";
 

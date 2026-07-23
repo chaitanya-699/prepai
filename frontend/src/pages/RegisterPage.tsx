@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import RegisterForm from '../features/auth/components/RegisterForm'
+import '../styles/pages/home-page.css'
+import '../styles/pages/auth-pages.css'
 
 export default function RegisterPage() {
   const navigate = useNavigate()

@@ -351,7 +351,7 @@ export const generateQuiz = async (
             if (payload.notesFileName) {
                 form.append('notesFileName', payload.notesFileName)
             }
-            response = await fetch(quizEndpoints.generateQuiz, {
+            response = await fetch(quizEndpoints.generateQuizWithFile, {
                 method: 'POST',
                 credentials: 'include',
                 body: form
